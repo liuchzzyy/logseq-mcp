@@ -444,17 +444,11 @@ async def serve(
             for line in print_tree(block)
         )
 
-    def _format_no_arg_result(method_name: str, result: dict) -> str:
-        """Format results for methods without arguments"""
-        formatters = {
-            'logseq_get_current_page_content': lambda r: format_blocks_tree(r),
-            'logseq_get_editing_block_content': lambda r: f"Current content:\n{r}",
-            'logseq_get_current_page': _format_current_page
-        }
-        return formatters[method_name](result)
-
     def format_no_arg_result(name: str, result) -> str:
         """Format results for methods without arguments"""
+        if result is None:
+            return "No result"
+
         formatters = {
             'logseq_get_current_page': lambda r: (
                 f"Current: {r.get('name', r.get('content', 'Untitled'))}\n"
@@ -617,7 +611,9 @@ async def serve(
 
             # Automatic handling for no-argument methods
             if name in no_arg_methods and not arguments:
-                api_method = name.split('_', 1)[1].replace('_', '.')
+                snake_case = name.split('_', 1)[1].split('_')
+                # Convert to camelCase for API method
+                api_method = snake_case[0] + ''.join(map(str.title, snake_case[1:]))
                 result = make_request(f"logseq.Editor.{api_method}", [])
                 return GetPromptResult(
                     description=f"Current {name.split('_')[-1].replace('_', ' ')}",
