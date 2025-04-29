@@ -606,7 +606,6 @@ async def serve(
             # Handle methods that don't require arguments
             no_arg_methods = {
                 'logseq_get_current_page',
-                'logseq_get_current_page_content',
                 'logseq_get_editing_block_content',
                 'logseq_get_all_pages'
             }
@@ -751,6 +750,21 @@ async def serve(
                                 type="text",
                                 text="Exited editing" +
                                      (" with block selected" if select_block else "")
+                            )
+                        )
+                    ]
+                )
+
+            elif name == "logseq_get_current_page_content":
+                result = make_request("logseq.Editor.getCurrentPageBlocksTree", [])
+                return GetPromptResult(
+                    description="Current page content",
+                    messages=[
+                        PromptMessage(
+                            role="user",
+                            content=TextContent(
+                                type="text",
+                                text=format_blocks_tree(result)
                             )
                         )
                     ]
