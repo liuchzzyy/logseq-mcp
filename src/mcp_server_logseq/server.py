@@ -420,15 +420,6 @@ async def serve(
             for p in sorted(pages, key=lambda x: x.get('name', ''))
         )
 
-    def _format_current_page(result: dict) -> str:
-        """Special formatting for current page/block context"""
-        entity_type = "Page" if 'name' in result else "Block"
-        return (
-            f"Current {entity_type}: {result.get('name', result.get('content', 'Untitled'))}\n"
-            f"UUID: {result.get('uuid')}\n"
-            f"Last updated: {result.get('updatedAt', 'N/A')}"
-        )
-
     def format_blocks_tree(blocks: list) -> str:
         """Format hierarchical block structure"""
         def print_tree(block, level=0):
@@ -512,7 +503,7 @@ async def serve(
                 )
                 return [TextContent(
                     type="text",
-                    text=format_page_result(result)
+                    text=format_no_arg_result(name, result)
                 )]
 
             elif name == "logseq_get_page":
