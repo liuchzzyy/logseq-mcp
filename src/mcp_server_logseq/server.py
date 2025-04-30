@@ -396,21 +396,14 @@ async def serve(
 
     def format_page_result(result: dict) -> str:
         """Format page creation result into readable text."""
+        properties = "".join(
+            f"  {key}: {value}\n" for key, value in result.get('propertiesTextValues', {}).items()
+        )
         return (
             f"Created page: {result.get('name')}\n"
             f"UUID: {result.get('uuid')}\n"
             f"Journal: {result.get('journal', False)}\n"
-            f"Blocks: {len(result.get('blocks', []))}"
-        )
-
-    def format_page_detail(page: dict) -> str:
-        """Format single page details"""
-        return (
-            f"Page: {page.get('name', 'Unnamed')}\n"
-            f"UUID: {page.get('uuid')}\n"
-            f"Created: {page.get('createdAt', 0)}\n"
-            f"Updated: {page.get('updatedAt', 0)}\n"
-            f"Blocks: {len(page.get('blocks', []))}"
+            f"Properties:{('\n' + properties) if properties else ' None'}"
         )
 
     def format_pages_list(pages: list) -> str:
@@ -517,7 +510,7 @@ async def serve(
                 )
                 return [TextContent(
                     type="text",
-                    text=format_page_detail(result)
+                    text=format_page_result(result)
                 )]
 
             elif name == "logseq_get_all_pages":
@@ -697,7 +690,7 @@ async def serve(
                             role="user",
                             content=TextContent(
                                 type="text",
-                                text=format_page_detail(result)
+                                text=format_page_result(result)
                             )
                         )
                     ]
