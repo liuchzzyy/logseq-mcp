@@ -416,7 +416,7 @@ async def serve(
     def format_pages_list(pages: list) -> str:
         """Format list of pages"""
         return "\n".join(
-            f"{p['name']} (UUID: {p['uuid']})"
+            f"{p['name']} (UUID: {p.get('uuid')})"
             for p in sorted(pages, key=lambda x: x.get('name', ''))
         )
 
@@ -464,7 +464,7 @@ async def serve(
             'logseq_get_current_page_content': lambda r: format_blocks_tree(r),
             'logseq_get_editing_block_content': lambda r: f"Current content:\n{r}",
             'logseq_get_all_pages': lambda r: "\n".join(
-                f"{p['name']} ({p['uuid']})" for p in sorted(r, key=lambda x: x['name'])
+                f"{p['name']} ({p.get('uuid', 'alias')})" for p in sorted(r, key=lambda x: x['name'])
             )
         }
         return formatters[name](result)
