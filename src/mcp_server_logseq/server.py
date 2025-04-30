@@ -408,11 +408,13 @@ async def serve(
         properties = "".join(
             f"  {key}: {value}\n" for key, value in result.get('propertiesTextValues', {}).items()
         )
+        properties_text = "\n" + properties if properties else " None"
+
         return (
             f"Created page: {result.get('name')}\n"
             f"UUID: {result.get('uuid')}\n"
             f"Journal: {result.get('journal', False)}\n"
-            f"Properties:{('\n' + properties) if properties else ' None'}"
+            f"Properties: {properties_text}"
         )
 
     def format_pages_list(pages: list) -> str:
