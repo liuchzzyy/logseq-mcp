@@ -17,6 +17,22 @@ A Model Context Protocol server that provides direct integration with Logseq's k
 }
 ```
 
+### If you have errors, use 0.0.1 version:
+```json
+{
+  "mcpServers": {
+    "logseq": {
+      "command": "uvx",
+      "args": ["mcp-server-logseq==0.0.1"],
+      "env": {
+        "LOGSEQ_API_TOKEN": "<YOUR_KEY>",
+        "LOGSEQ_API_URL": "http://127.0.0.1:12315"
+      }
+    }
+  }
+}
+```
+
 ## Available Tools
 
 ### Block Operations
