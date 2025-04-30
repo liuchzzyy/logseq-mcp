@@ -177,7 +177,16 @@ async def serve(
         api_key: Logseq API token for authentication
         logseq_url: Base URL of Logseq graph (default: http://localhost:12315)
     """
-    server = Server("mcp-sever-logseq")
+    # instructions = """Server for interacting with Logseq API.
+    # Use it when you need to get or add data to your Logseq graph.
+    # Logseq is a privacy-first, open-source platform for knowledge management and collaboration.
+    # This server provides tools for creating and editing blocks, managing pages, and retrieving content.
+    # For example, if you need to get page details, use get_page, if you need to get page content, use get_page_content."""
+
+    server = Server(
+        name="mcp-sever-logseq",
+        # instructions=instructions
+    )
 
     def make_request(method: str, args: list) -> dict:
         """Make authenticated request to Logseq API."""
