@@ -420,15 +420,6 @@ async def serve(
             for p in sorted(pages, key=lambda x: x.get('name', ''))
         )
 
-    def _format_current_page(result: dict) -> str:
-        """Special formatting for current page/block context"""
-        entity_type = "Page" if 'name' in result else "Block"
-        return (
-            f"Current {entity_type}: {result.get('name', result.get('content', 'Untitled'))}\n"
-            f"UUID: {result.get('uuid')}\n"
-            f"Last updated: {result.get('updatedAt', 'N/A')}"
-        )
-
     def format_blocks_tree(blocks: list) -> str:
         """Format hierarchical block structure"""
         def print_tree(block, level=0):
@@ -444,17 +435,11 @@ async def serve(
             for line in print_tree(block)
         )
 
-    def _format_no_arg_result(method_name: str, result: dict) -> str:
-        """Format results for methods without arguments"""
-        formatters = {
-            'logseq_get_current_page_content': lambda r: format_blocks_tree(r),
-            'logseq_get_editing_block_content': lambda r: f"Current content:\n{r}",
-            'logseq_get_current_page': _format_current_page
-        }
-        return formatters[method_name](result)
-
     def format_no_arg_result(name: str, result) -> str:
         """Format results for methods without arguments"""
+        if result is None:
+            return "No result"
+
         formatters = {
             'logseq_get_current_page': lambda r: (
                 f"Current: {r.get('name', r.get('content', 'Untitled'))}\n"
@@ -518,7 +503,7 @@ async def serve(
                 )
                 return [TextContent(
                     type="text",
-                    text=format_page_result(result)
+                    text=format_no_arg_result(name, result)
                 )]
 
             elif name == "logseq_get_page":
@@ -617,7 +602,9 @@ async def serve(
 
             # Automatic handling for no-argument methods
             if name in no_arg_methods and not arguments:
-                api_method = name.split('_', 1)[1].replace('_', '.')
+                snake_case = name.split('_', 1)[1].split('_')
+                # Convert to camelCase for API method
+                api_method = snake_case[0] + ''.join(map(str.title, snake_case[1:]))
                 result = make_request(f"logseq.Editor.{api_method}", [])
                 return GetPromptResult(
                     description=f"Current {name.split('_')[-1].replace('_', ' ')}",
