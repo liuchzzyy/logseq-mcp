@@ -1,6 +1,10 @@
 # Logseq MCP Server
 A Model Context Protocol server that provides direct integration with Logseq's knowledge base. This server enables LLMs to interact with Logseq graphs, create pages, manage blocks, and organize information programmatically.
 
+<a href="https://glama.ai/mcp/servers/@dailydaniel/logseq-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@dailydaniel/logseq-mcp/badge" alt="Logseq Server MCP server" />
+</a>
+
 ## Usage with Claude Desktop
 ```json
 {
