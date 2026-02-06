@@ -24,7 +24,7 @@ Add this to your Claude Desktop config (`~/Library/Application Support/Claude/cl
   "mcpServers": {
     "logseq": {
       "command": "uvx",
-      "args": ["mcp-server-logseq"],
+      "args": ["logseq-mcp"],
       "env": {
         "LOGSEQ_API_TOKEN": "<YOUR_API_TOKEN>",
         "LOGSEQ_API_URL": "http://127.0.0.1:12315"
@@ -37,8 +37,8 @@ Add this to your Claude Desktop config (`~/Library/Application Support/Claude/cl
 ### Alternative: Using pip
 
 ```bash
-pip install mcp-server-logseq
-LOGSEQ_API_TOKEN=<token> mcp-server-logseq
+pip install mcp-server-logseq  # PyPI package name
+LOGSEQ_API_TOKEN=<token> logseq-mcp
 ```
 
 ## Available Tools (25 Total)
@@ -310,12 +310,12 @@ uv sync
 
 Run the server:
 ```bash
-uv run python -m src
+uv run logseq-mcp
 ```
 
 Or with explicit environment:
 ```bash
-LOGSEQ_API_TOKEN=<token> LOGSEQ_API_URL=http://localhost:12315 uv run python -m src
+LOGSEQ_API_TOKEN=<token> LOGSEQ_API_URL=http://localhost:12315 uv run logseq-mcp
 ```
 
 ## Configuration
@@ -422,56 +422,56 @@ uv run ruff format src/ tests/
 
 # Run type checker
 uv run ty check --extra-search-path src src
+```
 
 ### CLI Usage
 
 Serve (default):
 ```bash
-uv run python -m src serve
+uv run logseq-mcp serve
 ```
 
 Pages:
 ```bash
-uv run python -m src pages list
-uv run python -m src pages get --name "Page Name" --children
-uv run python -m src pages create --name "New Page" --properties '{"tags":"demo"}'
-uv run python -m src pages delete --name "Old Page"
-uv run python -m src pages rename --old "Old" --new "New"
+uv run logseq-mcp pages list
+uv run logseq-mcp pages get --name "Page Name" --children
+uv run logseq-mcp pages create --name "New Page" --properties '{"tags":"demo"}'
+uv run logseq-mcp pages delete --name "Old Page"
+uv run logseq-mcp pages rename --old "Old" --new "New"
 ```
 
 Journals:
 ```bash
-uv run python -m src journals create --name "2026-02-06"
-uv run python -m src journals list
+uv run logseq-mcp journals create --name "2026-02-06"
+uv run logseq-mcp journals list
 ```
 
 Blocks:
 ```bash
-uv run python -m src blocks get --uuid <uuid>
-uv run python -m src blocks insert --parent "Page Name" --content "- item" --as-page-block
-uv run python -m src blocks update --uuid <uuid> --content "updated"
-uv run python -m src blocks delete --uuid <uuid>
-uv run python -m src blocks move --uuid <uuid> --target <uuid> --as-child
-uv run python -m src blocks batch-insert --parent "Page" --file blocks.json
-uv run python -m src blocks page-blocks --page "Page Name"
-uv run python -m src blocks current-page-blocks
-uv run python -m src blocks current-block
+uv run logseq-mcp blocks get --uuid <uuid>
+uv run logseq-mcp blocks insert --parent "Page Name" --content "- item" --as-page-block
+uv run logseq-mcp blocks update --uuid <uuid> --content "updated"
+uv run logseq-mcp blocks delete --uuid <uuid>
+uv run logseq-mcp blocks move --uuid <uuid> --target <uuid> --as-child
+uv run logseq-mcp blocks batch-insert --parent "Page" --file blocks.json
+uv run logseq-mcp blocks page-blocks --page "Page Name"
+uv run logseq-mcp blocks current-page-blocks
+uv run logseq-mcp blocks current-block
 ```
 
 Queries:
 ```bash
-uv run python -m src queries simple --query "[[tag]]"
-uv run python -m src queries advanced --query "[:find ...]" --inputs '["arg1", 2]'
-uv run python -m src queries tasks --marker TODO --priority A
-uv run python -m src queries blocks-with-prop --property status --value done
+uv run logseq-mcp queries simple --query "[[tag]]"
+uv run logseq-mcp queries advanced --query "[:find ...]" --inputs '["arg1", 2]'
+uv run logseq-mcp queries tasks --marker TODO --priority A
+uv run logseq-mcp queries blocks-with-prop --property status --value done
 ```
 
 Graph:
 ```bash
-uv run python -m src graph info
-uv run python -m src graph user-configs
-uv run python -m src graph git-status
-```
+uv run logseq-mcp graph info
+uv run logseq-mcp graph user-configs
+uv run logseq-mcp graph git-status
 ```
 
 ## Debugging
@@ -479,7 +479,7 @@ uv run python -m src graph git-status
 Use the MCP Inspector for debugging:
 
 ```bash
-npx @modelcontextprotocol/inspector uv --directory . run mcp-server-logseq
+npx @modelcontextprotocol/inspector uv --directory . run logseq-mcp
 ```
 
 ## Troubleshooting
