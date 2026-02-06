@@ -1,7 +1,16 @@
 """Configuration management using Pydantic Settings."""
 
+from importlib.metadata import version as _pkg_version
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _get_version() -> str:
+    try:
+        return _pkg_version("mcp-server-logseq")
+    except Exception:
+        return "0.0.0"
 
 
 class LogseqSettings(BaseSettings):
@@ -18,8 +27,8 @@ class LogseqSettings(BaseSettings):
     api_max_retries: int = Field(default=3, description="Maximum number of API retry attempts")
 
     # Server Configuration
-    server_name: str = Field(default="mcp-server-logseq")
-    server_version: str = Field(default="1.0.0")
+    server_name: str = Field(default="logseq-mcp")
+    server_version: str = Field(default_factory=_get_version)
 
     # Feature Flags
     enable_advanced_queries: bool = Field(default=True)

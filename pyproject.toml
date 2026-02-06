@@ -56,7 +56,7 @@ build-backend = "hatchling.build"
 packages = ["src"]
 
 [project.scripts]
-mcp-server-logseq = "src.client.cli:main"
+logseq-mcp = "src.client.cli:main"
 
 [tool.ruff]
 line-length = 100
