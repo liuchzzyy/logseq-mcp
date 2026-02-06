@@ -7,6 +7,7 @@ from typing import Any
 from mcp.types import TextContent, Tool
 
 from ..models.enums import ToolName
+from ..models.responses import BlockEntity
 from ..models.schemas import (
     AdvancedQueryInput,
     BatchBlockInput,
@@ -193,11 +194,17 @@ class ToolHandler:
                 # Block operations
                 case ToolName.INSERT_BLOCK:
                     result = await self.block_service.insert(InsertBlockInput(**arguments))
-                    text = self.block_service.format_block_tree([result])
+                    if isinstance(result, BlockEntity):
+                        text = self.block_service.format_block_tree([result])
+                    else:
+                        text = "Block inserted successfully"
 
                 case ToolName.UPDATE_BLOCK:
                     result = await self.block_service.update(UpdateBlockInput(**arguments))
-                    text = f"Updated block: {result.content[:100]}"
+                    if isinstance(result, BlockEntity):
+                        text = f"Updated block: {result.content[:100]}"
+                    else:
+                        text = "Block updated successfully"
 
                 case ToolName.DELETE_BLOCK:
                     await self.block_service.delete(DeleteBlockInput(**arguments))
@@ -209,11 +216,17 @@ class ToolHandler:
 
                 case ToolName.MOVE_BLOCK:
                     result = await self.block_service.move(MoveBlockInput(**arguments))
-                    text = f"Moved block to: {result.parent}"
+                    if isinstance(result, BlockEntity):
+                        text = f"Moved block to: {result.parent}"
+                    else:
+                        text = "Block moved successfully"
 
                 case ToolName.INSERT_BATCH:
                     results = await self.block_service.insert_batch(BatchBlockInput(**arguments))
-                    text = f"Inserted {len(results)} blocks"
+                    if isinstance(results, list):
+                        text = f"Inserted {len(results)} blocks"
+                    else:
+                        text = "Batch insert completed successfully"
 
                 case ToolName.GET_PAGE_BLOCKS:
                     page_name = arguments.get("src_page")
@@ -303,7 +316,10 @@ class ToolHandler:
 
                 case ToolName.GIT_STATUS:
                     result = await self.graph_service.git_status(EmptyInput())
-                    text = self.graph_service.format_git_status(result)
+                    if isinstance(result, dict):
+                        text = json.dumps(result, indent=2)
+                    else:
+                        text = self.graph_service.format_git_status(result)
 
                 case _:
                     raise ValueError(f"Unknown tool: {name}")

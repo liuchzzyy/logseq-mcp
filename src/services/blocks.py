@@ -38,13 +38,15 @@ class BlockService:
 
         return BlockEntity.from_api(result)
 
-    async def update(self, input_data: UpdateBlockInput) -> BlockEntity:
+    async def update(self, input_data: UpdateBlockInput) -> BlockEntity | bool:
         """Update block content."""
         options = {}
         if input_data.properties:
             options["properties"] = input_data.properties
 
         result = self.client.update_block(input_data.uuid, input_data.content, **options)
+        if not isinstance(result, dict):
+            return True
         return BlockEntity.from_api(result)
 
     async def delete(self, input_data: DeleteBlockInput) -> bool:
@@ -57,21 +59,21 @@ class BlockService:
         result = self.client.get_block(input_data.uuid)
         return BlockEntity.from_api(result)
 
-    async def move(self, input_data: MoveBlockInput) -> BlockEntity:
+    async def move(self, input_data: MoveBlockInput) -> BlockEntity | bool:
         """Move block to new location."""
         result = self.client.move_block(
             input_data.uuid, input_data.target_uuid, children=input_data.as_child
         )
+        if not isinstance(result, dict):
+            return True
         return BlockEntity.from_api(result)
 
-    async def insert_batch(self, input_data: BatchBlockInput) -> list[BlockEntity]:
+    async def insert_batch(self, input_data: BatchBlockInput) -> list[BlockEntity] | bool:
         """Insert multiple blocks."""
         raw_results: Any = self.client.insert_batch_blocks(input_data.parent, input_data.blocks)
         if not isinstance(raw_results, list):
-            return []
+            return True
         dict_results = [r for r in raw_results if isinstance(r, dict)]
-        if len(dict_results) != len(raw_results):
-            return []
         typed_results = cast(list[dict[str, Any]], dict_results)
         return [BlockEntity.from_api(r) for r in typed_results]
 

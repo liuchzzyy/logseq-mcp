@@ -30,10 +30,12 @@ class GraphService:
 
     async def git_status(self, _: EmptyInput) -> Union[str, dict[str, Any]]:
         """Get git status."""
-        status = self.client.git_status()
-        if isinstance(status, str):
-            return status
-        return dict(status)
+        result = self.client.git_status()
+        if isinstance(result, dict) and "error" in result:
+            return result
+        if isinstance(result, str):
+            return result
+        return dict(result) if result else {"status": "ok"}
 
     def format_graph(self, graph: GraphEntity) -> str:
         """Format graph info as text."""

@@ -10,8 +10,8 @@ class BlockEntity(BaseModel):
 
     uuid: str
     content: str
-    page: dict[str, Any]
-    parent: dict[str, Any] | None = None
+    page: dict[str, Any] | int = {}
+    parent: dict[str, Any] | int | None = None
     children: list["BlockEntity"] = []
     properties: dict[str, Any] = {}
     marker: str | None = None
@@ -20,12 +20,16 @@ class BlockEntity(BaseModel):
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> "BlockEntity":
         """Create from API response."""
+        raw_children = data.get("children", [])
+        children = [
+            cls.from_api(c) for c in raw_children if isinstance(c, dict)
+        ]
         return cls(
             uuid=data.get("uuid", ""),
             content=data.get("content", ""),
             page=data.get("page", {}),
             parent=data.get("parent"),
-            children=[cls.from_api(c) for c in data.get("children", [])],
+            children=children,
             properties=data.get("properties", {}),
             marker=data.get("marker"),
             priority=data.get("priority"),
