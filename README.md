@@ -508,6 +508,14 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### v1.1.0 (2026-02-07)
+- Standardized field naming across all models and handlers
+- Wired editor tool handlers (edit_block, exit_editing, get_editing_content)
+- Fixed BlockEntity/PageEntity type annotations for Logseq API compatibility
+- Cleaned up unused code and intermediate files
+- Updated documentation (CLAUDE.md, README.md, Chinese guide)
+- Full integration test: 26/26 CLI commands passed
+
 ### v1.0.0 (2026-02-06)
 - Complete refactor to 4-layer architecture
 - Added 25 MCP tools (up from 9)
