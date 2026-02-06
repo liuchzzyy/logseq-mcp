@@ -54,4 +54,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 9 core MCP tools for block and page operations
 - Basic HTTP API client
 - Simple README documentation
-- PyPI package setup
+- Package setup

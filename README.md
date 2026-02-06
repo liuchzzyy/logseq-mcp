@@ -23,8 +23,8 @@ Add this to your Claude Desktop config (`~/Library/Application Support/Claude/cl
 {
   "mcpServers": {
     "logseq": {
-      "command": "uvx",
-      "args": ["logseq-mcp"],
+      "command": "uv",
+      "args": ["--directory", "/path/to/logseq-mcp", "run", "logseq-mcp"],
       "env": {
         "LOGSEQ_API_TOKEN": "<YOUR_API_TOKEN>",
         "LOGSEQ_API_URL": "http://127.0.0.1:12315"
@@ -32,13 +32,6 @@ Add this to your Claude Desktop config (`~/Library/Application Support/Claude/cl
     }
   }
 }
-```
-
-### Alternative: Using pip
-
-```bash
-pip install mcp-server-logseq  # PyPI package name
-LOGSEQ_API_TOKEN=<token> logseq-mcp
 ```
 
 ## Available Tools (25 Total)
