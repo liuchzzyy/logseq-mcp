@@ -9,35 +9,34 @@ from typing import Any
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
-from .logseq import LogseqClient
 from ..config.settings import settings
-from ..server import serve
-from ..services.blocks import BlockService
-from ..services.graph import GraphService
-from ..services.pages import PageService
-from ..services.queries import QueryService
 from ..models.schemas import (
     AdvancedQueryInput,
     BatchBlockInput,
     CreatePageInput,
     DeleteBlockInput,
     DeletePageInput,
+    EmptyInput,
     GetAllPagesInput,
     GetBlockInput,
     GetPageInput,
     GetTasksInput,
+    InsertBlockInput,
     MoveBlockInput,
     RenamePageInput,
     SimpleQueryInput,
-    InsertBlockInput,
     UpdateBlockInput,
-    EmptyInput,
 )
+from ..server import serve
+from ..services.blocks import BlockService
+from ..services.graph import GraphService
+from ..services.pages import PageService
+from ..services.queries import QueryService
+from .logseq import LogseqClient
 
 
 def _load_api_credentials(args: argparse.Namespace) -> tuple[str, str]:
     """Resolve API key and URL from CLI args or environment/settings."""
-
     api_key = args.api_key or os.getenv("LOGSEQ_API_TOKEN") or settings.api_token
     if not api_key:
         raise SystemExit(
@@ -82,7 +81,6 @@ def _to_serializable(data: Any) -> Any:
 
 def _print_output(data: Any) -> None:
     """Pretty-print CLI output."""
-
     if isinstance(data, str):
         print(data)
         return
@@ -100,7 +98,7 @@ def _parse_json(value: str | None, *, field: str) -> Any:
 
 def _load_json_file(path: str) -> Any:
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError as exc:
         raise SystemExit(f"File not found: {path}") from exc
@@ -110,23 +108,25 @@ def _load_json_file(path: str) -> Any:
 
 def main() -> None:
     """CLI entrypoint: serve (default) or Logseq operations via subcommands."""
-
     load_dotenv()
 
     parser = argparse.ArgumentParser(
         prog="logseq-mcp",
         description=(
-            "Logseq MCP Server & CLI — interact with Logseq graphs via MCP protocol or command line\n"
+            "Logseq MCP Server & CLI — interact with Logseq graphs via MCP protocol "
+            "or command line\n"
             "Logseq MCP 服务器和命令行工具 — 通过 MCP 协议或命令行与 Logseq 图谱交互"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--api-key", type=str,
+        "--api-key",
+        type=str,
         help="Logseq API authorization token / Logseq API 授权令牌",
     )
     parser.add_argument(
-        "--url", type=str,
+        "--url",
+        type=str,
         help="Logseq HTTP API URL (default: http://localhost:12315) / Logseq API 地址",
     )
 
@@ -134,23 +134,30 @@ def main() -> None:
 
     # serve
     subparsers.add_parser(
-        "serve", help="Start MCP server over stdio (default) / 启动 MCP 服务器 (默认)",
+        "serve",
+        help="Start MCP server over stdio (default) / 启动 MCP 服务器 (默认)",
     )
 
     # pages
     pages = subparsers.add_parser(
-        "pages", help="Manage pages (list/get/create/delete/rename) / 页面管理",
+        "pages",
+        help="Manage pages (list/get/create/delete/rename) / 页面管理",
     )
     pages_sub = pages.add_subparsers(dest="action", required=True)
 
     pages_sub.add_parser(
-        "list", help="List all pages in the graph / 列出所有页面",
+        "list",
+        help="List all pages in the graph / 列出所有页面",
     ).add_argument(
-        "--repo", type=str, default=None,
+        "--repo",
+        type=str,
+        default=None,
         help="Repository name (uses current graph if omitted) / 仓库名（省略则使用当前图谱）",
     )
 
-    get_page = pages_sub.add_parser("get", help="Get page details by name or UUID / 按名称或 UUID 获取页面")
+    get_page = pages_sub.add_parser(
+        "get", help="Get page details by name or UUID / 按名称或 UUID 获取页面"
+    )
     get_page.add_argument("--name", required=True, help="Page name or UUID / 页面名或 UUID")
     get_page.add_argument("--children", action="store_true", help="Include child blocks / 包含子块")
 
@@ -158,9 +165,11 @@ def main() -> None:
     create_page.add_argument("--name", required=True, help="Page name / 页面名称")
     create_page.add_argument(
         "--properties",
-        help="Page properties as JSON, e.g. '{\"tags\":\"demo\"}' / 页面属性 (JSON 格式)",
+        help='Page properties as JSON, e.g. \'{"tags":"demo"}\' / 页面属性 (JSON 格式)',
     )
-    create_page.add_argument("--journal", action="store_true", help="Create as journal page / 创建为日志页")
+    create_page.add_argument(
+        "--journal", action="store_true", help="Create as journal page / 创建为日志页"
+    )
     create_page.add_argument(
         "--format",
         choices=["markdown", "org"],
@@ -182,27 +191,35 @@ def main() -> None:
     rename_page.add_argument("--new", required=True, help="New page name / 新页面名")
 
     # journals
-    journals = subparsers.add_parser("journals", help="Manage journal pages (create/list) / 日志页管理")
+    journals = subparsers.add_parser(
+        "journals", help="Manage journal pages (create/list) / 日志页管理"
+    )
     journals_sub = journals.add_subparsers(dest="action", required=True)
     journal_create = journals_sub.add_parser(
-        "create", help="Create a journal page for a date / 创建日志页",
+        "create",
+        help="Create a journal page for a date / 创建日志页",
     )
     journal_create.add_argument(
-        "--name", required=True,
+        "--name",
+        required=True,
         help="Journal date, e.g. '2026-02-07' / 日志日期",
     )
     journal_create.add_argument("--properties", help="Page properties as JSON / 页面属性 (JSON)")
     journal_list = journals_sub.add_parser(
-        "list", help="List all pages (including journals) / 列出所有页面（含日志）",
+        "list",
+        help="List all pages (including journals) / 列出所有页面（含日志）",
     )
     journal_list.add_argument(
-        "--repo", type=str, default=None,
+        "--repo",
+        type=str,
+        default=None,
         help="Repository name (uses current graph if omitted) / 仓库名",
     )
 
     # blocks
     blocks = subparsers.add_parser(
-        "blocks", help="Manage blocks (get/insert/update/delete/move) / 块管理",
+        "blocks",
+        help="Manage blocks (get/insert/update/delete/move) / 块管理",
     )
     blocks_sub = blocks.add_subparsers(dest="action", required=True)
 
@@ -216,11 +233,13 @@ def main() -> None:
     )
     blk_insert.add_argument("--content", required=True, help="Block content (Markdown) / 块内容")
     blk_insert.add_argument(
-        "--as-page-block", action="store_true",
+        "--as-page-block",
+        action="store_true",
         help="Insert as top-level page block / 插入为顶级页面块",
     )
     blk_insert.add_argument(
-        "--before", action="store_true",
+        "--before",
+        action="store_true",
         help="Insert before the parent block / 插入到父块之前",
     )
     blk_insert.add_argument("--custom-uuid", help="Custom UUID for the new block / 自定义 UUID")
@@ -237,53 +256,64 @@ def main() -> None:
     blk_move = blocks_sub.add_parser("move", help="Move a block to another location / 移动块")
     blk_move.add_argument("--uuid", required=True, help="Block UUID to move / 要移动的块 UUID")
     blk_move.add_argument(
-        "--target", required=True,
+        "--target",
+        required=True,
         help="Target block UUID (destination) / 目标块 UUID",
     )
     blk_move.add_argument(
-        "--as-child", action="store_true",
+        "--as-child",
+        action="store_true",
         help="Move as child of target (default: sibling) / 作为子块移动（默认为同级）",
     )
 
     blk_batch = blocks_sub.add_parser(
-        "batch-insert", help="Batch insert blocks from a JSON file / 从 JSON 文件批量插入块",
+        "batch-insert",
+        help="Batch insert blocks from a JSON file / 从 JSON 文件批量插入块",
     )
     blk_batch.add_argument(
-        "--parent", required=True,
+        "--parent",
+        required=True,
         help="Parent block UUID or page name / 父块 UUID 或页面名",
     )
     blk_batch.add_argument(
-        "--file", required=True,
+        "--file",
+        required=True,
         help="Path to JSON file containing blocks array / JSON 文件路径",
     )
 
     blk_page_blocks = blocks_sub.add_parser(
-        "page-blocks", help="Get all blocks of a page as tree / 获取页面所有块（树形）",
+        "page-blocks",
+        help="Get all blocks of a page as tree / 获取页面所有块（树形）",
     )
     blk_page_blocks.add_argument("--page", required=True, help="Page name / 页面名")
 
     blocks_sub.add_parser(
-        "current-page-blocks", help="Get all blocks of the active page / 获取当前页面所有块",
+        "current-page-blocks",
+        help="Get all blocks of the active page / 获取当前页面所有块",
     )
     blocks_sub.add_parser(
-        "current-block", help="Get the currently focused block / 获取当前聚焦块",
+        "current-block",
+        help="Get the currently focused block / 获取当前聚焦块",
     )
 
     # queries
     queries = subparsers.add_parser(
-        "queries", help="Query Logseq data (simple/advanced/tasks/properties) / 查询",
+        "queries",
+        help="Query Logseq data (simple/advanced/tasks/properties) / 查询",
     )
     queries_sub = queries.add_subparsers(dest="action", required=True)
 
     q_simple = queries_sub.add_parser("simple", help="Run a simple Logseq query / 简单查询")
     q_simple.add_argument(
-        "--query", required=True,
+        "--query",
+        required=True,
         help="Query string, e.g. '[[tag]]' or '#important' / 查询字符串",
     )
 
     q_adv = queries_sub.add_parser("advanced", help="Run an advanced DataScript query / 高级查询")
     q_adv.add_argument(
-        "--query", required=True,
+        "--query",
+        required=True,
         help="DataScript query, e.g. '[:find (pull ?b [*]) :where ...]' / DataScript 查询语句",
     )
     q_adv.add_argument(
@@ -293,7 +323,8 @@ def main() -> None:
     )
 
     q_tasks = queries_sub.add_parser(
-        "tasks", help="Get tasks, optionally filtered / 获取任务（可按状态/优先级过滤）",
+        "tasks",
+        help="Get tasks, optionally filtered / 获取任务（可按状态/优先级过滤）",
     )
     q_tasks.add_argument(
         "--marker",
@@ -313,7 +344,8 @@ def main() -> None:
 
     # graph
     graph = subparsers.add_parser(
-        "graph", help="Graph & Git operations (info/configs/git-status) / 图谱与 Git 操作",
+        "graph",
+        help="Graph & Git operations (info/configs/git-status) / 图谱与 Git 操作",
     )
     graph_sub = graph.add_subparsers(dest="action", required=True)
     graph_sub.add_parser("info", help="Get current graph name, path, and URL / 获取图谱信息")

@@ -54,7 +54,9 @@ class PromptHandler:
                 name="logseq_get_page",
                 description="Get page details",
                 arguments=[
-                    PromptArgument(name="page_name", description="Page name or UUID", required=True),
+                    PromptArgument(
+                        name="page_name", description="Page name or UUID", required=True
+                    ),
                 ],
             ),
             Prompt(

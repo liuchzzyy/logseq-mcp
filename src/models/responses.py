@@ -21,9 +21,7 @@ class BlockEntity(BaseModel):
     def from_api(cls, data: dict[str, Any]) -> "BlockEntity":
         """Create from API response."""
         raw_children = data.get("children", [])
-        children = [
-            cls.from_api(c) for c in raw_children if isinstance(c, dict)
-        ]
+        children = [cls.from_api(c) for c in raw_children if isinstance(c, dict)]
         return cls(
             uuid=data.get("uuid", ""),
             content=data.get("content", ""),
