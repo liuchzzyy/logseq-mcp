@@ -113,123 +113,212 @@ def main() -> None:
 
     load_dotenv()
 
-    parser = argparse.ArgumentParser(description="LogSeq MCP CLI")
-    parser.add_argument("--api-key", type=str, help="LogSeq API key")
-    parser.add_argument("--url", type=str, help="LogSeq API host")
+    parser = argparse.ArgumentParser(
+        prog="logseq-mcp",
+        description=(
+            "Logseq MCP Server & CLI — interact with Logseq graphs via MCP protocol or command line\n"
+            "Logseq MCP 服务器和命令行工具 — 通过 MCP 协议或命令行与 Logseq 图谱交互"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--api-key", type=str,
+        help="Logseq API authorization token / Logseq API 授权令牌",
+    )
+    parser.add_argument(
+        "--url", type=str,
+        help="Logseq HTTP API URL (default: http://localhost:12315) / Logseq API 地址",
+    )
 
     subparsers = parser.add_subparsers(dest="command")
 
     # serve
-    subparsers.add_parser("serve", help="Run MCP server (default)")
-
-    # pages
-    pages = subparsers.add_parser("pages", help="Page operations")
-    pages_sub = pages.add_subparsers(dest="action", required=True)
-
-    pages_sub.add_parser("list", help="List all pages").add_argument(
-        "--repo", type=str, default=None, help="Repository name (optional)"
+    subparsers.add_parser(
+        "serve", help="Start MCP server over stdio (default) / 启动 MCP 服务器 (默认)",
     )
 
-    get_page = pages_sub.add_parser("get", help="Get page by name/UUID")
-    get_page.add_argument("--name", required=True, help="Page name or UUID")
-    get_page.add_argument("--children", action="store_true", help="Include child blocks")
+    # pages
+    pages = subparsers.add_parser(
+        "pages", help="Manage pages (list/get/create/delete/rename) / 页面管理",
+    )
+    pages_sub = pages.add_subparsers(dest="action", required=True)
 
-    create_page = pages_sub.add_parser("create", help="Create page")
-    create_page.add_argument("--name", required=True, help="Page name")
-    create_page.add_argument("--properties", help="JSON object of properties")
-    create_page.add_argument("--journal", action="store_true", help="Create as journal")
+    pages_sub.add_parser(
+        "list", help="List all pages in the graph / 列出所有页面",
+    ).add_argument(
+        "--repo", type=str, default=None,
+        help="Repository name (uses current graph if omitted) / 仓库名（省略则使用当前图谱）",
+    )
+
+    get_page = pages_sub.add_parser("get", help="Get page details by name or UUID / 按名称或 UUID 获取页面")
+    get_page.add_argument("--name", required=True, help="Page name or UUID / 页面名或 UUID")
+    get_page.add_argument("--children", action="store_true", help="Include child blocks / 包含子块")
+
+    create_page = pages_sub.add_parser("create", help="Create a new page / 创建新页面")
+    create_page.add_argument("--name", required=True, help="Page name / 页面名称")
+    create_page.add_argument(
+        "--properties",
+        help="Page properties as JSON, e.g. '{\"tags\":\"demo\"}' / 页面属性 (JSON 格式)",
+    )
+    create_page.add_argument("--journal", action="store_true", help="Create as journal page / 创建为日志页")
     create_page.add_argument(
         "--format",
         choices=["markdown", "org"],
         default="markdown",
-        help="Page format",
+        help="Page format (default: markdown) / 页面格式",
     )
     create_page.add_argument(
         "--create-first-block",
         action="store_true",
         default=False,
-        help="Create initial empty block",
+        help="Create an initial empty block / 创建初始空块",
     )
 
-    delete_page = pages_sub.add_parser("delete", help="Delete page")
-    delete_page.add_argument("--name", required=True, help="Page name")
+    delete_page = pages_sub.add_parser("delete", help="Delete a page by name / 按名称删除页面")
+    delete_page.add_argument("--name", required=True, help="Page name to delete / 要删除的页面名")
 
-    rename_page = pages_sub.add_parser("rename", help="Rename page")
-    rename_page.add_argument("--old", required=True, help="Current page name")
-    rename_page.add_argument("--new", required=True, help="New page name")
+    rename_page = pages_sub.add_parser("rename", help="Rename an existing page / 重命名页面")
+    rename_page.add_argument("--old", required=True, help="Current page name / 当前页面名")
+    rename_page.add_argument("--new", required=True, help="New page name / 新页面名")
 
-    # journals (alias of pages create with journal flag)
-    journals = subparsers.add_parser("journals", help="Journal operations")
+    # journals
+    journals = subparsers.add_parser("journals", help="Manage journal pages (create/list) / 日志页管理")
     journals_sub = journals.add_subparsers(dest="action", required=True)
-    journal_create = journals_sub.add_parser("create", help="Create journal page")
-    journal_create.add_argument("--name", required=True, help="Journal page name")
-    journal_create.add_argument("--properties", help="JSON object of properties")
-    journal_list = journals_sub.add_parser("list", help="List pages (all)")
-    journal_list.add_argument("--repo", type=str, default=None, help="Repository name (optional)")
+    journal_create = journals_sub.add_parser(
+        "create", help="Create a journal page for a date / 创建日志页",
+    )
+    journal_create.add_argument(
+        "--name", required=True,
+        help="Journal date, e.g. '2026-02-07' / 日志日期",
+    )
+    journal_create.add_argument("--properties", help="Page properties as JSON / 页面属性 (JSON)")
+    journal_list = journals_sub.add_parser(
+        "list", help="List all pages (including journals) / 列出所有页面（含日志）",
+    )
+    journal_list.add_argument(
+        "--repo", type=str, default=None,
+        help="Repository name (uses current graph if omitted) / 仓库名",
+    )
 
     # blocks
-    blocks = subparsers.add_parser("blocks", help="Block operations")
+    blocks = subparsers.add_parser(
+        "blocks", help="Manage blocks (get/insert/update/delete/move) / 块管理",
+    )
     blocks_sub = blocks.add_subparsers(dest="action", required=True)
 
-    blk_get = blocks_sub.add_parser("get", help="Get block by UUID")
-    blk_get.add_argument("--uuid", required=True)
+    blk_get = blocks_sub.add_parser("get", help="Get block details by UUID / 按 UUID 获取块")
+    blk_get.add_argument("--uuid", required=True, help="Block UUID / 块 UUID")
 
-    blk_insert = blocks_sub.add_parser("insert", help="Insert block")
-    blk_insert.add_argument("--parent", help="Parent block UUID or page name")
-    blk_insert.add_argument("--content", required=True, help="Block content")
-    blk_insert.add_argument("--as-page-block", action="store_true", help="Insert as page block")
-    blk_insert.add_argument("--before", action="store_true", help="Insert before parent")
-    blk_insert.add_argument("--custom-uuid", help="Custom UUID")
-    blk_insert.add_argument("--properties", help="JSON object of properties")
+    blk_insert = blocks_sub.add_parser("insert", help="Insert a new block / 插入新块")
+    blk_insert.add_argument(
+        "--parent",
+        help="Parent block UUID or page name (e.g. '[[Page]]') / 父块 UUID 或页面名",
+    )
+    blk_insert.add_argument("--content", required=True, help="Block content (Markdown) / 块内容")
+    blk_insert.add_argument(
+        "--as-page-block", action="store_true",
+        help="Insert as top-level page block / 插入为顶级页面块",
+    )
+    blk_insert.add_argument(
+        "--before", action="store_true",
+        help="Insert before the parent block / 插入到父块之前",
+    )
+    blk_insert.add_argument("--custom-uuid", help="Custom UUID for the new block / 自定义 UUID")
+    blk_insert.add_argument("--properties", help="Block properties as JSON / 块属性 (JSON)")
 
-    blk_update = blocks_sub.add_parser("update", help="Update block")
-    blk_update.add_argument("--uuid", required=True)
-    blk_update.add_argument("--content", required=True)
-    blk_update.add_argument("--properties", help="JSON object of properties")
+    blk_update = blocks_sub.add_parser("update", help="Update block content by UUID / 更新块内容")
+    blk_update.add_argument("--uuid", required=True, help="Block UUID to update / 要更新的块 UUID")
+    blk_update.add_argument("--content", required=True, help="New block content / 新内容")
+    blk_update.add_argument("--properties", help="Updated properties as JSON / 更新属性 (JSON)")
 
-    blk_delete = blocks_sub.add_parser("delete", help="Delete block")
-    blk_delete.add_argument("--uuid", required=True)
+    blk_delete = blocks_sub.add_parser("delete", help="Delete a block by UUID / 删除块")
+    blk_delete.add_argument("--uuid", required=True, help="Block UUID to delete / 要删除的块 UUID")
 
-    blk_move = blocks_sub.add_parser("move", help="Move block")
-    blk_move.add_argument("--uuid", required=True)
-    blk_move.add_argument("--target", required=True, help="Target block UUID")
-    blk_move.add_argument("--as-child", action="store_true", help="Move as child")
+    blk_move = blocks_sub.add_parser("move", help="Move a block to another location / 移动块")
+    blk_move.add_argument("--uuid", required=True, help="Block UUID to move / 要移动的块 UUID")
+    blk_move.add_argument(
+        "--target", required=True,
+        help="Target block UUID (destination) / 目标块 UUID",
+    )
+    blk_move.add_argument(
+        "--as-child", action="store_true",
+        help="Move as child of target (default: sibling) / 作为子块移动（默认为同级）",
+    )
 
-    blk_batch = blocks_sub.add_parser("batch-insert", help="Batch insert blocks from JSON file")
-    blk_batch.add_argument("--parent", required=True, help="Parent block or page")
-    blk_batch.add_argument("--file", required=True, help="Path to JSON file of blocks list")
+    blk_batch = blocks_sub.add_parser(
+        "batch-insert", help="Batch insert blocks from a JSON file / 从 JSON 文件批量插入块",
+    )
+    blk_batch.add_argument(
+        "--parent", required=True,
+        help="Parent block UUID or page name / 父块 UUID 或页面名",
+    )
+    blk_batch.add_argument(
+        "--file", required=True,
+        help="Path to JSON file containing blocks array / JSON 文件路径",
+    )
 
-    blk_page_blocks = blocks_sub.add_parser("page-blocks", help="Get blocks of a page")
-    blk_page_blocks.add_argument("--page", required=True, help="Page name")
+    blk_page_blocks = blocks_sub.add_parser(
+        "page-blocks", help="Get all blocks of a page as tree / 获取页面所有块（树形）",
+    )
+    blk_page_blocks.add_argument("--page", required=True, help="Page name / 页面名")
 
-    blocks_sub.add_parser("current-page-blocks", help="Get blocks of current page")
-    blocks_sub.add_parser("current-block", help="Get currently focused block")
+    blocks_sub.add_parser(
+        "current-page-blocks", help="Get all blocks of the active page / 获取当前页面所有块",
+    )
+    blocks_sub.add_parser(
+        "current-block", help="Get the currently focused block / 获取当前聚焦块",
+    )
 
     # queries
-    queries = subparsers.add_parser("queries", help="Query operations")
+    queries = subparsers.add_parser(
+        "queries", help="Query Logseq data (simple/advanced/tasks/properties) / 查询",
+    )
     queries_sub = queries.add_subparsers(dest="action", required=True)
 
-    q_simple = queries_sub.add_parser("simple", help="Simple query")
-    q_simple.add_argument("--query", required=True, help="Query string, e.g., [[tag]] or #tag")
+    q_simple = queries_sub.add_parser("simple", help="Run a simple Logseq query / 简单查询")
+    q_simple.add_argument(
+        "--query", required=True,
+        help="Query string, e.g. '[[tag]]' or '#important' / 查询字符串",
+    )
 
-    q_adv = queries_sub.add_parser("advanced", help="Advanced datascript query")
-    q_adv.add_argument("--query", required=True, help="Datascript query string")
-    q_adv.add_argument("--inputs", help="JSON array of inputs", default="[]")
+    q_adv = queries_sub.add_parser("advanced", help="Run an advanced DataScript query / 高级查询")
+    q_adv.add_argument(
+        "--query", required=True,
+        help="DataScript query, e.g. '[:find (pull ?b [*]) :where ...]' / DataScript 查询语句",
+    )
+    q_adv.add_argument(
+        "--inputs",
+        help="Query input parameters as JSON array / 查询参数 (JSON 数组)",
+        default="[]",
+    )
 
-    q_tasks = queries_sub.add_parser("tasks", help="Get tasks")
-    q_tasks.add_argument("--marker", help="Marker filter (TODO, DOING, DONE, etc.)")
-    q_tasks.add_argument("--priority", help="Priority filter (A, B, C)")
+    q_tasks = queries_sub.add_parser(
+        "tasks", help="Get tasks, optionally filtered / 获取任务（可按状态/优先级过滤）",
+    )
+    q_tasks.add_argument(
+        "--marker",
+        help="Filter: TODO, DOING, DONE, NOW, LATER, WAITING, CANCELLED / 状态过滤",
+    )
+    q_tasks.add_argument(
+        "--priority",
+        help="Filter: A (high), B (medium), C (low) / 优先级过滤",
+    )
 
-    q_prop = queries_sub.add_parser("blocks-with-prop", help="Blocks with property")
-    q_prop.add_argument("--property", required=True, help="Property name")
-    q_prop.add_argument("--value", help="Optional value to match")
+    q_prop = queries_sub.add_parser(
+        "blocks-with-prop",
+        help="Find blocks with a specific property / 按属性查找块",
+    )
+    q_prop.add_argument("--property", required=True, help="Property name / 属性名")
+    q_prop.add_argument("--value", help="Optional property value to match / 属性值（可选）")
 
     # graph
-    graph = subparsers.add_parser("graph", help="Graph operations")
+    graph = subparsers.add_parser(
+        "graph", help="Graph & Git operations (info/configs/git-status) / 图谱与 Git 操作",
+    )
     graph_sub = graph.add_subparsers(dest="action", required=True)
-    graph_sub.add_parser("info", help="Get current graph info")
-    graph_sub.add_parser("user-configs", help="Get user configs")
-    graph_sub.add_parser("git-status", help="Get git status")
+    graph_sub.add_parser("info", help="Get current graph name, path, and URL / 获取图谱信息")
+    graph_sub.add_parser("user-configs", help="Get Logseq user preferences / 获取用户配置")
+    graph_sub.add_parser("git-status", help="Get git status of the graph / 获取 Git 状态")
 
     args = parser.parse_args()
 

@@ -1,1 +1,1 @@
-"""Tests for mcp-server-logseq."""
+"""Tests for logseq-mcp."""

@@ -69,6 +69,6 @@ Tests import modules via absolute paths (e.g., `from client.logseq import Logseq
 
 ## Build
 
-- Build system: hatchling. Package name: `mcp-server-logseq`. CLI entry point: `logseq-mcp`.
+- Build system: hatchling. Package name: `logseq-mcp`. CLI entry point: `logseq-mcp`.
 - `[tool.hatch.build.targets.wheel] packages = ["src"]`
 - Python >=3.10 required (match/case syntax).

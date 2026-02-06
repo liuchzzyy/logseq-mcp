@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 def _get_version() -> str:
     try:
-        return _pkg_version("mcp-server-logseq")
+        return _pkg_version("logseq-mcp")
     except Exception:
         return "0.0.0"
 
