@@ -26,15 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Migrated from single-file architecture to modular 4-layer design
-- Moved from `src/mcp_server_logseq/` to flat `src/` structure with absolute imports
-- Updated all imports to use absolute paths (e.g., `from client.logseq import ...`)
+- Restructured to `src/` package with relative imports
+- CLI entry point: `logseq-mcp` (via `src.client.cli:main`)
 - Enhanced configuration management with Pydantic Settings
 - Improved error messages and response formatting
 
 ### Fixed
-- Import path issues for flat module structure
-- Type annotations for better IDE support
-- Response type handling for list vs dict API returns
+- BlockEntity compatibility with Logseq API response formats (int page/parent, null returns, non-dict children)
+- Graceful error handling for unsupported API methods (e.g., git_status)
+- Consistent field naming across schemas (page_name, uuid)
 
 ### Technical Details
 - **Architecture**: Infrastructure → Domain → Application → Presentation layers

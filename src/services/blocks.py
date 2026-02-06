@@ -106,6 +106,18 @@ class BlockService:
             return BlockEntity.from_api(result)
         return None
 
+    async def edit_block(self, uuid: str, pos: int = 0) -> None:
+        """Enter edit mode for a block."""
+        self.client.edit_block(uuid, pos)
+
+    async def exit_editing_mode(self, select_block: bool = False) -> None:
+        """Exit editing mode."""
+        self.client.exit_editing_mode(select_block)
+
+    async def get_editing_content(self) -> Any:
+        """Get content of block being edited."""
+        return self.client.get_editing_block_content()
+
     def format_block_tree(self, blocks: list[BlockEntity]) -> str:
         """Format blocks as readable text."""
         return Formatters.format_blocks(blocks)

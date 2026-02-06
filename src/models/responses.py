@@ -150,13 +150,3 @@ class Formatters:
     def format_git_status(status: str) -> str:
         """Format git status as text."""
         return f"Git Status:\n{status}"
-
-    @staticmethod
-    def format_success(message: str) -> str:
-        """Format success message."""
-        return f"✓ {message}"
-
-    @staticmethod
-    def format_error(error: str) -> str:
-        """Format error message."""
-        return f"✗ Error: {error}"

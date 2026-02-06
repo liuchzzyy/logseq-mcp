@@ -290,26 +290,34 @@ class TestToolHandler:
     @pytest.mark.asyncio
     async def test_handle_edit_block(self, handler, mock_services):
         """Test edit block tool handler."""
+        mock_services["block"].edit_block = AsyncMock(return_value=None)
+
         result = await handler.handle_tool(ToolName.EDIT_BLOCK, {"uuid": "block-uuid"})
 
         assert len(result) == 1
         assert "edit mode" in result[0].text
+        mock_services["block"].edit_block.assert_called_once_with("block-uuid", 0)
 
     @pytest.mark.asyncio
     async def test_handle_exit_editing_mode(self, handler, mock_services):
         """Test exit editing mode tool handler."""
+        mock_services["block"].exit_editing_mode = AsyncMock(return_value=None)
+
         result = await handler.handle_tool(ToolName.EXIT_EDITING_MODE, {})
 
         assert len(result) == 1
         assert "Exited editing mode" in result[0].text
+        mock_services["block"].exit_editing_mode.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_handle_get_editing_content(self, handler, mock_services):
         """Test get editing content tool handler."""
+        mock_services["block"].get_editing_content = AsyncMock(return_value="Some content")
+
         result = await handler.handle_tool(ToolName.GET_EDITING_CONTENT, {})
 
         assert len(result) == 1
-        assert "editing content" in result[0].text
+        assert "Some content" in result[0].text
 
     @pytest.mark.asyncio
     async def test_handle_simple_query(self, handler, mock_services):

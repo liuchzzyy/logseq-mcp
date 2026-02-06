@@ -276,14 +276,18 @@ class ToolHandler:
                         text = "No block selected"
 
                 case ToolName.EDIT_BLOCK:
-                    # This is a UI operation, no return value
-                    text = f"Entered edit mode for block {arguments.get('uuid')}"
+                    params = EditBlockInput(**arguments)
+                    await self.block_service.edit_block(params.uuid, params.pos)
+                    text = f"Entered edit mode for block {params.uuid}"
 
                 case ToolName.EXIT_EDITING_MODE:
+                    params = ExitEditingInput(**arguments)
+                    await self.block_service.exit_editing_mode(params.select_block)
                     text = "Exited editing mode"
 
                 case ToolName.GET_EDITING_CONTENT:
-                    text = "Current editing content"
+                    result = await self.block_service.get_editing_content()
+                    text = str(result) if result else "No content being edited"
 
                 # Query operations
                 case ToolName.SIMPLE_QUERY:
