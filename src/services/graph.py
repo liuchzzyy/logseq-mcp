@@ -1,6 +1,6 @@
 """Graph operations service."""
 
-from typing import Any, Union
+from typing import Any
 
 from ..client.logseq import LogseqClient
 from ..models.responses import Formatters, GraphEntity
@@ -28,7 +28,7 @@ class GraphService:
         self.client.git_commit(input_data.message)
         return True
 
-    async def git_status(self, _: EmptyInput) -> Union[str, dict[str, Any]]:
+    async def git_status(self, _: EmptyInput) -> str | dict[str, Any]:
         """Get git status."""
         result = self.client.git_status()
         if isinstance(result, dict) and "error" in result:

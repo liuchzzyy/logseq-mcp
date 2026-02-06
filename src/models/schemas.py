@@ -99,7 +99,7 @@ class CreatePageInput(LogseqBaseModel):
 class GetPageInput(LogseqBaseModel):
     """Input for getting a page."""
 
-    src_page: str = Field(..., description="Page name or UUID")
+    page_name: str = Field(..., description="Page name or UUID")
     include_children: bool = Field(default=False, description="Include child blocks")
 
 
@@ -128,7 +128,7 @@ class GetAllPagesInput(LogseqBaseModel):
 class EditBlockInput(LogseqBaseModel):
     """Input for entering edit mode."""
 
-    src_block: str = Field(..., description="Block UUID")
+    uuid: str = Field(..., description="Block UUID")
     pos: int = Field(default=0, description="Cursor position", ge=0, le=10000)
 
 

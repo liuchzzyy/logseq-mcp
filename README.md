@@ -108,7 +108,7 @@ Insert multiple blocks at once.
 Get all blocks in a page as a tree structure.
 
 **Parameters:**
-- `src_page` (string, required): Page name or UUID
+- `page_name` (string, required): Page name or UUID
 
 #### `logseq_get_current_page_content`
 Get all blocks from the currently active page.
@@ -143,7 +143,7 @@ Create a new page.
 Get page details.
 
 **Parameters:**
-- `src_page` (string, required): Page name or UUID
+- `page_name` (string, required): Page name or UUID
 - `include_children` (boolean): Include child blocks
 
 #### `logseq_delete_page`
@@ -181,7 +181,7 @@ Get the currently focused block.
 Enter edit mode for a block.
 
 **Parameters:**
-- `src_block` (string, required): Block UUID
+- `uuid` (string, required): Block UUID
 - `pos` (number): Cursor position (0-10000)
 
 #### `logseq_exit_editing_mode`
@@ -275,7 +275,7 @@ Create a new Logseq page.
 Get page details.
 
 **Arguments:**
-- `src_page` (required): Page name or UUID
+- `page_name` (required): Page name or UUID
 
 ### `logseq_get_current_page`
 Get the currently active page.

@@ -164,7 +164,7 @@ class TestToolHandler:
         mock_services["block"].get_page_blocks = AsyncMock(return_value=blocks)
         mock_services["block"].format_block_tree = Mock(return_value="- Block 1")
 
-        result = await handler.handle_tool(ToolName.GET_PAGE_BLOCKS, {"src_page": "Test Page"})
+        result = await handler.handle_tool(ToolName.GET_PAGE_BLOCKS, {"page_name": "Test Page"})
 
         assert len(result) == 1
         mock_services["block"].get_page_blocks.assert_called_once_with("Test Page")
@@ -174,7 +174,7 @@ class TestToolHandler:
         """Test get page blocks without page name raises error."""
         from mcp.shared.exceptions import McpError
 
-        with pytest.raises(McpError, match="src_page is required"):
+        with pytest.raises(McpError, match="page_name is required"):
             await handler.handle_tool(ToolName.GET_PAGE_BLOCKS, {})
 
     @pytest.mark.asyncio
@@ -210,7 +210,7 @@ class TestToolHandler:
         mock_services["page"].get = AsyncMock(return_value=page)
         mock_services["page"].format_page = Mock(return_value="Page: Test Page")
 
-        result = await handler.handle_tool(ToolName.GET_PAGE, {"src_page": "Test Page"})
+        result = await handler.handle_tool(ToolName.GET_PAGE, {"page_name": "Test Page"})
 
         assert len(result) == 1
         mock_services["page"].get.assert_called_once()
@@ -251,28 +251,25 @@ class TestToolHandler:
 
     @pytest.mark.asyncio
     async def test_handle_get_current_page(self, handler, mock_services):
-        """Test get current page tool handler with block selected."""
-        block = BlockEntity(
-            uuid="block-uuid",
-            content="Current content",
-            page={"name": "Page"},
-        )
-        mock_services["block"].get_current_block = AsyncMock(return_value=block)
+        """Test get current page tool handler with page active."""
+        page = PageEntity(uuid="page-uuid", name="Current Page")
+        mock_services["page"].get_current_page = AsyncMock(return_value=page)
+        mock_services["page"].format_page = Mock(return_value="Page: Current Page")
 
         result = await handler.handle_tool(ToolName.GET_CURRENT_PAGE, {})
 
         assert len(result) == 1
-        assert "Current:" in result[0].text
+        mock_services["page"].get_current_page.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_handle_get_current_page_no_block(self, handler, mock_services):
-        """Test get current page tool handler with no block selected."""
-        mock_services["block"].get_current_block = AsyncMock(return_value=None)
+    async def test_handle_get_current_page_none(self, handler, mock_services):
+        """Test get current page tool handler with no active page."""
+        mock_services["page"].get_current_page = AsyncMock(return_value=None)
 
         result = await handler.handle_tool(ToolName.GET_CURRENT_PAGE, {})
 
         assert len(result) == 1
-        assert "No block selected" in result[0].text
+        assert "No active page" in result[0].text
 
     @pytest.mark.asyncio
     async def test_handle_get_current_block(self, handler, mock_services):
@@ -293,7 +290,7 @@ class TestToolHandler:
     @pytest.mark.asyncio
     async def test_handle_edit_block(self, handler, mock_services):
         """Test edit block tool handler."""
-        result = await handler.handle_tool(ToolName.EDIT_BLOCK, {"src_block": "block-uuid"})
+        result = await handler.handle_tool(ToolName.EDIT_BLOCK, {"uuid": "block-uuid"})
 
         assert len(result) == 1
         assert "edit mode" in result[0].text
@@ -478,7 +475,7 @@ class TestPromptHandler:
     @pytest.mark.asyncio
     async def test_handle_get_page_prompt(self, handler, mock_services):
         """Test get page prompt handler."""
-        result = await handler.handle_prompt("logseq_get_page", {"src_page": "Test Page"})
+        result = await handler.handle_prompt("logseq_get_page", {"page_name": "Test Page"})
 
         assert "Test Page" in result.description
         assert "Test Page" in result.messages[0].content.text

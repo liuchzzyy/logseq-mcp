@@ -229,9 +229,9 @@ class ToolHandler:
                         text = "Batch insert completed successfully"
 
                 case ToolName.GET_PAGE_BLOCKS:
-                    page_name = arguments.get("src_page")
+                    page_name = arguments.get("page_name")
                     if page_name is None:
-                        raise ValueError("src_page is required for GET_PAGE_BLOCKS")
+                        raise ValueError("page_name is required for GET_PAGE_BLOCKS")
                     results = await self.block_service.get_page_blocks(page_name)
                     text = self.block_service.format_block_tree(results)
 
@@ -262,11 +262,11 @@ class ToolHandler:
 
                 # Editor operations
                 case ToolName.GET_CURRENT_PAGE:
-                    result = await self.block_service.get_current_block()
+                    result = await self.page_service.get_current_page()
                     if result:
-                        text = f"Current: {result.content[:100]}"
+                        text = self.page_service.format_page(result)
                     else:
-                        text = "No block selected"
+                        text = "No active page"
 
                 case ToolName.GET_CURRENT_BLOCK:
                     result = await self.block_service.get_current_block()
@@ -277,7 +277,7 @@ class ToolHandler:
 
                 case ToolName.EDIT_BLOCK:
                     # This is a UI operation, no return value
-                    text = f"Entered edit mode for block {arguments.get('src_block')}"
+                    text = f"Entered edit mode for block {arguments.get('uuid')}"
 
                 case ToolName.EXIT_EDITING_MODE:
                     text = "Exited editing mode"
@@ -327,6 +327,6 @@ class ToolHandler:
             return [TextContent(type="text", text=text)]
 
         except Exception as e:
-            from utils.errors import format_error
+            from ..utils.errors import format_error
 
             raise format_error(e)

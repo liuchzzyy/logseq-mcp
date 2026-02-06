@@ -308,7 +308,7 @@ class TestPageService:
             "originalName": "Test Page",
         }
 
-        input_data = GetPageInput(src_page="Test Page", include_children=True)
+        input_data = GetPageInput(page_name="Test Page", include_children=True)
         result = await service.get(input_data)
 
         assert isinstance(result, PageEntity)

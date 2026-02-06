@@ -257,7 +257,7 @@ def main() -> None:
         elif action == "get":
             result = run(
                 page_service.get(
-                    GetPageInput(src_page=args.name, include_children=bool(args.children))
+                    GetPageInput(page_name=args.name, include_children=bool(args.children))
                 )
             )
             _print_output(result)

@@ -54,7 +54,7 @@ class PromptHandler:
                 name="logseq_get_page",
                 description="Get page details",
                 arguments=[
-                    PromptArgument(name="src_page", description="Page name or UUID", required=True),
+                    PromptArgument(name="page_name", description="Page name or UUID", required=True),
                 ],
             ),
             Prompt(
@@ -114,15 +114,15 @@ class PromptHandler:
                     )
 
                 case "logseq_get_page":
-                    src_page = arguments.get("src_page", "")
+                    page_name = arguments.get("page_name", "")
 
                     return GetPromptResult(
-                        description=f"Get page: {src_page}",
+                        description=f"Get page: {page_name}",
                         messages=[
                             PromptMessage(
                                 role="user",
                                 content=TextContent(
-                                    type="text", text=f"Please get page '{src_page}'"
+                                    type="text", text=f"Please get page '{page_name}'"
                                 ),
                             )
                         ],

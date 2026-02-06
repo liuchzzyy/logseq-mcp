@@ -207,19 +207,19 @@ class TestGetPageInput:
 
     def test_valid_input(self):
         """Test valid get page input."""
-        data = {"src_page": "Test Page", "include_children": True}
+        data = {"page_name": "Test Page", "include_children": True}
         model = GetPageInput(**data)
-        assert model.src_page == "Test Page"
+        assert model.page_name == "Test Page"
         assert model.include_children is True
 
-    def test_src_page_required(self):
-        """Test that src_page is required."""
+    def test_page_name_required(self):
+        """Test that page_name is required."""
         with pytest.raises(ValidationError):
             GetPageInput()
 
     def test_default_include_children(self):
         """Test default value for include_children."""
-        model = GetPageInput(src_page="Test")
+        model = GetPageInput(page_name="Test")
         assert model.include_children is False
 
 
@@ -275,28 +275,28 @@ class TestEditBlockInput:
 
     def test_valid_input(self):
         """Test valid edit block input."""
-        data = {"src_block": "block-uuid", "pos": 10}
+        data = {"uuid": "block-uuid", "pos": 10}
         model = EditBlockInput(**data)
-        assert model.src_block == "block-uuid"
+        assert model.uuid == "block-uuid"
         assert model.pos == 10
 
-    def test_src_block_required(self):
-        """Test that src_block is required."""
+    def test_uuid_required(self):
+        """Test that uuid is required."""
         with pytest.raises(ValidationError):
             EditBlockInput()
 
     def test_default_pos(self):
         """Test default position value."""
-        model = EditBlockInput(src_block="test")
+        model = EditBlockInput(uuid="test")
         assert model.pos == 0
 
     def test_pos_bounds(self):
         """Test position bounds validation."""
         with pytest.raises(ValidationError):
-            EditBlockInput(src_block="test", pos=-1)
+            EditBlockInput(uuid="test", pos=-1)
 
         with pytest.raises(ValidationError):
-            EditBlockInput(src_block="test", pos=10001)
+            EditBlockInput(uuid="test", pos=10001)
 
 
 class TestEmptyInput:

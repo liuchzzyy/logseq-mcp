@@ -34,7 +34,7 @@ class PageService:
     async def get(self, input_data: GetPageInput) -> PageEntity:
         """Get page by name or UUID."""
         result = self.client.get_page(
-            input_data.src_page, include_children=input_data.include_children
+            input_data.page_name, include_children=input_data.include_children
         )
         return PageEntity.from_api(result)
 
@@ -42,6 +42,13 @@ class PageService:
         """Get all pages."""
         results = self.client.get_all_pages(input_data.repo)
         return [PageEntity.from_api(r) for r in results]
+
+    async def get_current_page(self) -> PageEntity | None:
+        """Get current active page."""
+        result = self.client.get_current_page()
+        if isinstance(result, dict):
+            return PageEntity.from_api(result)
+        return None
 
     async def delete(self, input_data: DeletePageInput) -> bool:
         """Delete page."""
