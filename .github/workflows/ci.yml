@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      LOGSEQ_API_TOKEN: "test-token-for-ci"
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
