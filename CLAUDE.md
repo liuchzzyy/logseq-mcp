@@ -20,7 +20,7 @@ uv run ruff check src/ tests/
 uv run ruff format src/ tests/
 
 # Type check
-uv run ty check --extra-search-path src src
+uv run ty check --extra-search-path . src
 
 # CLI (requires LOGSEQ_API_TOKEN in .env or environment)
 uv run logseq-mcp --help

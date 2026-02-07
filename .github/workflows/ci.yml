@@ -40,7 +40,7 @@ jobs:
 
       - name: Run type checker (ty)
         run: |
-          uv run ty check --extra-search-path src src
+          uv run ty check --extra-search-path . src
 
       - name: Run tests with coverage
         run: |

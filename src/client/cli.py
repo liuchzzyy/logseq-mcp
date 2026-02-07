@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 
 from ..config.settings import settings
+from ..models.enums import PageFormat
 from ..models.schemas import (
     AdvancedQueryInput,
     BatchBlockInput,
@@ -409,7 +410,7 @@ def main() -> None:
                 page_name=args.name,
                 properties=properties,
                 journal=True,
-                format="markdown",
+                format=PageFormat.MARKDOWN,
                 create_first_block=True,
             )
             result = run(page_service.create(input_data))
