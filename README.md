@@ -328,6 +328,11 @@ LOGSEQ_API_TOKEN=<token> LOGSEQ_API_URL=http://localhost:12315 uv run logseq-mcp
 |----------|----------|---------|-------------|
 | `LOGSEQ_API_TOKEN` | Yes | - | Logseq API authorization token |
 | `LOGSEQ_API_URL` | No | `http://localhost:12315` | Logseq HTTP API endpoint |
+| `LOGSEQ_ENABLE_ADVANCED_QUERIES` | No | `true` | Enable advanced Datascript queries and task tools |
+| `LOGSEQ_ENABLE_GIT_OPERATIONS` | No | `false` | Enable git operations (commit/status) |
+| `LOGSEQ_ENABLE_ASSET_MANAGEMENT` | No | `false` | Reserved for future asset tools |
+| `LOGSEQ_API_TIMEOUT` | No | `10` | API request timeout in seconds |
+| `LOGSEQ_API_MAX_RETRIES` | No | `3` | Maximum number of API retry attempts |
 
 ## Architecture
 
@@ -383,6 +388,12 @@ Add a TODO block to [[Project Roadmap]]:
 Show me all TODO tasks with high priority
 ```
 
+### Advanced query (stable example)
+
+```bash
+uv run logseq-mcp queries advanced --query "[:find (pull ?p [*]) :where [?p :block/name]]"
+```
+
 ### Get current page content
 
 ```
@@ -429,6 +440,7 @@ Pages:
 uv run logseq-mcp pages list
 uv run logseq-mcp pages get --name "Page Name" --children
 uv run logseq-mcp pages create --name "New Page" --properties '{"tags":"demo"}'
+uv run logseq-mcp pages create --name "New Page" --no-create-first-block
 uv run logseq-mcp pages delete --name "Old Page"
 uv run logseq-mcp pages rename --old "Old" --new "New"
 ```
@@ -465,6 +477,7 @@ Graph:
 uv run logseq-mcp graph info
 uv run logseq-mcp graph user-configs
 uv run logseq-mcp graph git-status
+uv run logseq-mcp graph git-support
 ```
 
 ## Debugging
@@ -491,6 +504,17 @@ Check that your `LOGSEQ_API_TOKEN` is correct and hasn't expired. Generate a new
 ### Module not found errors
 
 If running from source, ensure you're using `uv run` or have activated the virtual environment.
+
+### Advanced queries or Git tools missing
+
+These tools are gated by feature flags. Enable them via environment variables:
+
+```bash
+LOGSEQ_ENABLE_ADVANCED_QUERIES=true
+LOGSEQ_ENABLE_GIT_OPERATIONS=true
+```
+
+If `git-status` still returns `MethodNotExist`, your current Logseq build/API likely does not support Git operations. The CLI will report a hint in that case.
 
 ## Contributing
 

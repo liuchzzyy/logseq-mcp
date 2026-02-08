@@ -1,6 +1,6 @@
 """Tests for services module."""
 
-from unittest.mock import Mock
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -37,7 +37,7 @@ class TestBlockService:
     @pytest.fixture
     def mock_client(self):
         """Create mock Logseq client."""
-        return Mock(spec=LogseqClient)
+        return AsyncMock(spec=LogseqClient)
 
     @pytest.fixture
     def service(self, mock_client):
@@ -257,7 +257,7 @@ class TestPageService:
     @pytest.fixture
     def mock_client(self):
         """Create mock Logseq client."""
-        return Mock(spec=LogseqClient)
+        return AsyncMock(spec=LogseqClient)
 
     @pytest.fixture
     def service(self, mock_client):
@@ -394,7 +394,7 @@ class TestQueryService:
     @pytest.fixture
     def mock_client(self):
         """Create mock Logseq client."""
-        return Mock(spec=LogseqClient)
+        return AsyncMock(spec=LogseqClient)
 
     @pytest.fixture
     def service(self, mock_client):
@@ -516,7 +516,7 @@ class TestGraphService:
     @pytest.fixture
     def mock_client(self):
         """Create mock Logseq client."""
-        return Mock(spec=LogseqClient)
+        return AsyncMock(spec=LogseqClient)
 
     @pytest.fixture
     def service(self, mock_client):

@@ -21,7 +21,7 @@ class LogseqSettings(BaseSettings):
     )
 
     # API Configuration
-    api_token: str = Field(..., description="Logseq API authorization token")
+    api_token: str | None = Field(default=None, description="Logseq API authorization token")
     api_url: str = Field(default="http://localhost:12315", description="Logseq API base URL")
     api_timeout: int = Field(default=10, description="API request timeout in seconds")
     api_max_retries: int = Field(default=3, description="Maximum number of API retry attempts")

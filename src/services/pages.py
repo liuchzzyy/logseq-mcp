@@ -26,38 +26,38 @@ class PageService:
             "createFirstBlock": input_data.create_first_block,
         }
 
-        result = self.client.create_page(
+        result = await self.client.create_page(
             input_data.page_name, input_data.properties or {}, **options
         )
         return PageEntity.from_api(result)
 
     async def get(self, input_data: GetPageInput) -> PageEntity:
         """Get page by name or UUID."""
-        result = self.client.get_page(
+        result = await self.client.get_page(
             input_data.page_name, include_children=input_data.include_children
         )
         return PageEntity.from_api(result)
 
     async def get_all(self, input_data: GetAllPagesInput) -> list[PageEntity]:
         """Get all pages."""
-        results = self.client.get_all_pages(input_data.repo)
+        results = await self.client.get_all_pages(input_data.repo)
         return [PageEntity.from_api(r) for r in results]
 
     async def get_current_page(self) -> PageEntity | None:
         """Get current active page."""
-        result = self.client.get_current_page()
+        result = await self.client.get_current_page()
         if isinstance(result, dict):
             return PageEntity.from_api(result)
         return None
 
     async def delete(self, input_data: DeletePageInput) -> bool:
         """Delete page."""
-        self.client.delete_page(input_data.page_name)
+        await self.client.delete_page(input_data.page_name)
         return True
 
     async def rename(self, input_data: RenamePageInput) -> bool:
         """Rename page."""
-        self.client.rename_page(input_data.old_name, input_data.new_name)
+        await self.client.rename_page(input_data.old_name, input_data.new_name)
         return True
 
     def format_page(self, page: PageEntity) -> str:

@@ -19,6 +19,12 @@ from .services.queries import QueryService
 
 async def serve() -> None:
     """Run the Logseq MCP server."""
+    if not settings.api_token:
+        raise RuntimeError(
+            "LOGSEQ_API_TOKEN is required to start the server. "
+            "Set it in the environment or .env file."
+        )
+
     # Initialize server
     server = Server(settings.server_name)
 

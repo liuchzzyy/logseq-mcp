@@ -179,9 +179,16 @@ def main() -> None:
     )
     create_page.add_argument(
         "--create-first-block",
+        dest="create_first_block",
         action="store_true",
-        default=False,
-        help="Create an initial empty block / 创建初始空块",
+        default=True,
+        help="Create an initial empty block (default) / 创建初始空块（默认）",
+    )
+    create_page.add_argument(
+        "--no-create-first-block",
+        dest="create_first_block",
+        action="store_false",
+        help="Do not create an initial empty block / 不创建初始空块",
     )
 
     delete_page = pages_sub.add_parser("delete", help="Delete a page by name / 按名称删除页面")
@@ -352,6 +359,10 @@ def main() -> None:
     graph_sub.add_parser("info", help="Get current graph name, path, and URL / 获取图谱信息")
     graph_sub.add_parser("user-configs", help="Get Logseq user preferences / 获取用户配置")
     graph_sub.add_parser("git-status", help="Get git status of the graph / 获取 Git 状态")
+    graph_sub.add_parser(
+        "git-support",
+        help="Check whether Logseq API supports Git operations / 检查是否支持 Git 操作",
+    )
 
     args = parser.parse_args()
 
@@ -503,7 +514,14 @@ def main() -> None:
             result = run(graph_service.get_user_configs(EmptyInput()))
             _print_output(result)
         elif action == "git-status":
+            if not settings.enable_git_operations:
+                raise SystemExit(
+                    "Git operations are disabled. Set LOGSEQ_ENABLE_GIT_OPERATIONS=true to enable."
+                )
             result = run(graph_service.git_status(EmptyInput()))
+            _print_output(result)
+        elif action == "git-support":
+            result = run(graph_service.git_support())
             _print_output(result)
         return
 

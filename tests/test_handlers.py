@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from mcp.types import TextContent
 
+from src.config.settings import settings
 from src.handlers.prompts import PromptHandler
 from src.handlers.tools import ToolHandler
 from src.models.enums import ToolName
@@ -46,7 +47,13 @@ class TestToolHandler:
     def test_get_tools_count(self, handler):
         """Test that all tools are defined."""
         tools = handler.get_tools()
-        assert len(tools) == 25
+        base_count = 21  # blocks(8) + pages(5) + editor(5) + simple query(1) + graph(2)
+        expected = base_count
+        if settings.enable_advanced_queries:
+            expected += 2
+        if settings.enable_git_operations:
+            expected += 2
+        assert len(tools) == expected
 
     def test_get_tools_have_schemas(self, handler):
         """Test that all tools have input schemas."""
@@ -331,8 +338,9 @@ class TestToolHandler:
         mock_services["query"].simple_query.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_handle_advanced_query(self, handler, mock_services):
+    async def test_handle_advanced_query(self, handler, mock_services, monkeypatch):
         """Test advanced query tool handler."""
+        monkeypatch.setattr(settings, "enable_advanced_queries", True)
         mock_services["query"].advanced_query = AsyncMock(return_value=[])
         mock_services["query"].format_results = Mock(return_value="No results")
 
@@ -343,8 +351,9 @@ class TestToolHandler:
         mock_services["query"].advanced_query.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_handle_get_tasks(self, handler, mock_services):
+    async def test_handle_get_tasks(self, handler, mock_services, monkeypatch):
         """Test get tasks tool handler."""
+        monkeypatch.setattr(settings, "enable_advanced_queries", True)
         mock_services["query"].get_tasks = AsyncMock(return_value=[])
         mock_services["query"].format_results = Mock(return_value="No tasks")
 
@@ -377,8 +386,9 @@ class TestToolHandler:
         assert "en" in result[0].text
 
     @pytest.mark.asyncio
-    async def test_handle_git_commit(self, handler, mock_services):
+    async def test_handle_git_commit(self, handler, mock_services, monkeypatch):
         """Test git commit tool handler."""
+        monkeypatch.setattr(settings, "enable_git_operations", True)
         mock_services["graph"].git_commit = AsyncMock(return_value=True)
 
         result = await handler.handle_tool(ToolName.GIT_COMMIT, {"message": "Test commit"})
@@ -387,8 +397,9 @@ class TestToolHandler:
         assert "commit successful" in result[0].text
 
     @pytest.mark.asyncio
-    async def test_handle_git_status(self, handler, mock_services):
+    async def test_handle_git_status(self, handler, mock_services, monkeypatch):
         """Test git status tool handler."""
+        monkeypatch.setattr(settings, "enable_git_operations", True)
         status = {"modified": ["page.md"], "untracked": []}
         mock_services["graph"].git_status = AsyncMock(return_value=status)
         mock_services["graph"].format_git_status = Mock(return_value="Git Status: modified")

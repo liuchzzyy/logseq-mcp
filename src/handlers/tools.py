@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp.types import TextContent, Tool
 
+from ..config.settings import settings
 from ..models.enums import ToolName
 from ..models.responses import BlockEntity
 from ..models.schemas import (
@@ -53,7 +54,7 @@ class ToolHandler:
     @staticmethod
     def get_tools() -> list[Tool]:
         """Get all tool definitions."""
-        return [
+        tools: list[Tool] = [
             # Block tools
             Tool(
                 name=ToolName.INSERT_BLOCK,
@@ -153,16 +154,6 @@ class ToolHandler:
                 description="Run a simple Logseq query",
                 inputSchema=SimpleQueryInput.model_json_schema(),
             ),
-            Tool(
-                name=ToolName.ADVANCED_QUERY,
-                description="Run an advanced Datascript query",
-                inputSchema=AdvancedQueryInput.model_json_schema(),
-            ),
-            Tool(
-                name=ToolName.GET_TASKS,
-                description="Get all tasks with optional filters",
-                inputSchema=GetTasksInput.model_json_schema(),
-            ),
             # Graph tools
             Tool(
                 name=ToolName.GET_CURRENT_GRAPH,
@@ -174,22 +165,61 @@ class ToolHandler:
                 description="Get user configurations",
                 inputSchema=EmptyInput.model_json_schema(),
             ),
-            # Git tools
-            Tool(
-                name=ToolName.GIT_COMMIT,
-                description="Execute git commit",
-                inputSchema=GitCommitInput.model_json_schema(),
-            ),
-            Tool(
-                name=ToolName.GIT_STATUS,
-                description="Get git status",
-                inputSchema=EmptyInput.model_json_schema(),
-            ),
         ]
+
+        if settings.enable_advanced_queries:
+            tools.extend(
+                [
+                    Tool(
+                        name=ToolName.ADVANCED_QUERY,
+                        description="Run an advanced Datascript query",
+                        inputSchema=AdvancedQueryInput.model_json_schema(),
+                    ),
+                    Tool(
+                        name=ToolName.GET_TASKS,
+                        description="Get all tasks with optional filters",
+                        inputSchema=GetTasksInput.model_json_schema(),
+                    ),
+                ]
+            )
+
+        if settings.enable_git_operations:
+            tools.extend(
+                [
+                    Tool(
+                        name=ToolName.GIT_COMMIT,
+                        description="Execute git commit",
+                        inputSchema=GitCommitInput.model_json_schema(),
+                    ),
+                    Tool(
+                        name=ToolName.GIT_STATUS,
+                        description="Get git status",
+                        inputSchema=EmptyInput.model_json_schema(),
+                    ),
+                ]
+            )
+
+        return tools
 
     async def handle_tool(self, name: str, arguments: dict[str, Any]) -> Sequence[TextContent]:
         """Handle tool call."""
         try:
+            if (
+                name in {ToolName.ADVANCED_QUERY, ToolName.GET_TASKS}
+                and not settings.enable_advanced_queries
+            ):
+                from ..utils.errors import ValidationError
+
+                raise ValidationError("Advanced queries are disabled by configuration")
+
+            if (
+                name in {ToolName.GIT_COMMIT, ToolName.GIT_STATUS}
+                and not settings.enable_git_operations
+            ):
+                from ..utils.errors import ValidationError
+
+                raise ValidationError("Git operations are disabled by configuration")
+
             match name:
                 # Block operations
                 case ToolName.INSERT_BLOCK:

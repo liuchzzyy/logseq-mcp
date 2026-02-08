@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BlockEntity(BaseModel):
@@ -10,10 +10,10 @@ class BlockEntity(BaseModel):
 
     uuid: str
     content: str
-    page: dict[str, Any] | int = {}
+    page: dict[str, Any] | int = Field(default_factory=dict)
     parent: dict[str, Any] | int | None = None
-    children: list["BlockEntity"] = []
-    properties: dict[str, Any] = {}
+    children: list["BlockEntity"] = Field(default_factory=list)
+    properties: dict[str, Any] = Field(default_factory=dict)
     marker: str | None = None
     priority: str | None = None
 
@@ -41,8 +41,8 @@ class PageEntity(BaseModel):
     name: str
     original_name: str | None = None
     journal_day: int | None = None
-    properties: dict[str, Any] = {}
-    properties_text_values: dict[str, str] = {}
+    properties: dict[str, Any] = Field(default_factory=dict)
+    properties_text_values: dict[str, str] = Field(default_factory=dict)
     updated_at: str | int | None = None
     created_at: str | int | None = None
 
