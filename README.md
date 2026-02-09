@@ -532,6 +532,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### v2.1.1 (2026-02-09)
+  - Require Python >=3.12
+  - Update CI matrix to Python 3.12 only
+  - Align ruff target-version with Python 3.12
+
 ### v1.1.0 (2026-02-07)
 - Standardized field naming across all models and handlers
 - Wired editor tool handlers (edit_block, exit_editing, get_editing_content)

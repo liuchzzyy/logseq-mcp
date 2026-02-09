@@ -1,9 +1,9 @@
 [project]
 name = "logseq-mcp"
-version = "1.1.0"
+version = "2.1.1"
 description = "An MCP server for LogSeq API with advanced features"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 authors = [{ name = "Daniel Zholkovsky", email = "daniel@zholkovsky.com" }]
 maintainers = [{ name = "Daniel Zholkovsky", email = "daniel@zholkovsky.com" }]
 keywords = ["http", "mcp", "llm", "automation", "logseq"]
@@ -13,8 +13,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
@@ -60,7 +58,7 @@ logseq-mcp = "src.client.cli:main"
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 
 
 [tool.ruff.lint]

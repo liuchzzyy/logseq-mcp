@@ -13,7 +13,7 @@ jobs:
       LOGSEQ_API_TOKEN: "test-token-for-ci"
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ['3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
           uv run python -m pytest tests/ --cov=src --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
@@ -65,7 +65,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
@@ -81,4 +81,3 @@ jobs:
         with:
           name: dist
           path: dist/
-
