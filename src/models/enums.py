@@ -1,9 +1,9 @@
 """Enumeration definitions for Logseq MCP Server."""
 
-from enum import Enum
+from enum import StrEnum
 
 
-class ToolName(str, Enum):
+class ToolName(StrEnum):
     """All MCP tool names."""
 
     # Block operations
@@ -44,14 +44,14 @@ class ToolName(str, Enum):
     GIT_STATUS = "logseq_git_status"
 
 
-class PageFormat(str, Enum):
+class PageFormat(StrEnum):
     """Page format options."""
 
     MARKDOWN = "markdown"
     ORG = "org"
 
 
-class BlockMarker(str, Enum):
+class BlockMarker(StrEnum):
     """Task marker types."""
 
     TODO = "TODO"
@@ -63,7 +63,7 @@ class BlockMarker(str, Enum):
     CANCELLED = "CANCELLED"
 
 
-class Priority(str, Enum):
+class Priority(StrEnum):
     """Task priority levels."""
 
     HIGH = "A"

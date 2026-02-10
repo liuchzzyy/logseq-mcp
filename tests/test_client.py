@@ -6,7 +6,13 @@ import httpx
 import pytest
 
 from src.client.logseq import LogseqClient
-from src.utils.errors import APIError, AuthenticationError, ConnectionError as LogseqConnectionError
+from src.utils.errors import (
+    APIError,
+    AuthenticationError,
+)
+from src.utils.errors import (
+    ConnectionError as LogseqConnectionError,
+)
 
 
 class TestBaseAPIClient:

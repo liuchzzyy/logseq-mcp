@@ -6,7 +6,13 @@ from typing import Any
 import httpx
 from tenacity import AsyncRetrying, stop_after_attempt, wait_exponential
 
-from ..utils.errors import APIError, AuthenticationError, ConnectionError as LogseqConnectionError
+from ..utils.errors import (
+    APIError,
+    AuthenticationError,
+)
+from ..utils.errors import (
+    ConnectionError as LogseqConnectionError,
+)
 
 
 class BaseAPIClient(ABC):
