@@ -13,27 +13,15 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       LOGSEQ_API_TOKEN: "test-token-for-ci"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: 'latest'
-          enable-cache: true
-          cache-dependency-glob: '**/uv.lock'
-
-      - name: Install dependencies
-        run: |
-          uv sync --all-extras --dev
+      - name: Setup Logseq MCP
+        uses: ./.github/actions/setup-logseq-mcp
 
       - name: Run ruff linter
         run: |
@@ -45,27 +33,15 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       LOGSEQ_API_TOKEN: "test-token-for-ci"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: 'latest'
-          enable-cache: true
-          cache-dependency-glob: '**/uv.lock'
-
-      - name: Install dependencies
-        run: |
-          uv sync --all-extras --dev
+      - name: Setup Logseq MCP
+        uses: ./.github/actions/setup-logseq-mcp
 
       - name: Run type checker (ty)
         run: |
@@ -73,54 +49,36 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       LOGSEQ_API_TOKEN: "test-token-for-ci"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: 'latest'
-          enable-cache: true
-          cache-dependency-glob: '**/uv.lock'
-
-      - name: Install dependencies
-        run: |
-          uv sync --all-extras --dev
+      - name: Setup Logseq MCP
+        uses: ./.github/actions/setup-logseq-mcp
 
       - name: Run tests with coverage
         run: |
           uv run python -m pytest tests/ --cov=src --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [lint, typecheck, test]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: 'latest'
+      - name: Setup Logseq MCP
+        uses: ./.github/actions/setup-logseq-mcp
 
       - name: Build package
         run: |
