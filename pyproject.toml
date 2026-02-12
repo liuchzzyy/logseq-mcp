@@ -3,18 +3,12 @@ name = "logseq-mcp"
 version = "2.2.0"
 description = "An MCP server for LogSeq API with advanced features"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.12"
 authors = [{ name = "Daniel Zholkovsky", email = "daniel@zholkovsky.com" }]
 maintainers = [{ name = "Daniel Zholkovsky", email = "daniel@zholkovsky.com" }]
 keywords = ["http", "mcp", "llm", "automation", "logseq"]
-license = { text = "MIT" }
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
-]
+
 dependencies = [
     "httpx>=0.27.0",
     "mcp>=1.2.1,<2",
@@ -35,11 +29,7 @@ dev = [
     "faker>=20.0.0",
     "ty>=0.0.15",
 ]
-lint = [
-    "ruff>=0.1.0",
-    "ty>=0.0.15",
-    "pre-commit>=3.5.0",
-]
+lint = ["ruff>=0.1.0", "ty>=0.0.15", "pre-commit>=3.5.0"]
 
 [project.urls]
 homepage = "https://github.com/dailydaniel/logseq-mcp"
@@ -60,12 +50,9 @@ logseq-mcp = "src.client.cli:main"
 line-length = 100
 target-version = "py312"
 
-
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "N", "D", "UP"]
 ignore = ["D100", "D104"]
-
-
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
